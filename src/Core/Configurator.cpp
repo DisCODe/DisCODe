@@ -22,6 +22,10 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+#include <boost/algorithm/string.hpp>
+
+#include <cstdlib>
+
 
 namespace Core {
 
@@ -37,12 +41,63 @@ Configurator::~Configurator()
 
 }
 
-Task Configurator::loadConfiguration(std::string filename_, const std::vector<std::pair<std::string, std::string> > & overrides)
-{
-	// Set filename pointer to given one.
-	configuration_filename = filename_;
+void Configurator::loadConfiguration(const ptree * config) {
+	// get enviroment variable containing DCL directory
+	char * env_dcldir_tmp = std::getenv("DISCODE_DCL_DIR");
+	std::string env_dcldir;
+	if (env_dcldir_tmp)
+		env_dcldir = env_dcldir_tmp;
 
+	LOG(LINFO) << "ENV[DISCODE_DCL_DIR]='" << env_dcldir << "'";
+	boost::split(dcl_locations, env_dcldir, boost::is_any_of(":"));
+}
+
+typedef std::pair<std::string, std::string> pss;
+
+std::string & Configurator::substitute(std::string & text, const std::vector<std::pair<std::string, std::string> > & dict) {
+	BOOST_FOREACH(pss de, dict) {
+		boost::replace_all(text, de.first, de.second);
+	}
+
+	return text;
+}
+
+void Configurator::expandMacros(ptree & pt, const std::vector<std::pair<std::string, std::string> > & dict) {
+	BOOST_FOREACH(ptree::value_type & p, pt) {
+		std::string val = pt.get(p.first, "");
+		std::string oval = val;
+
+		if (val != "") {
+			substitute(val, dict);
+			pt.put(p.first, val);
+			if (val != oval) {
+				LOG(LINFO) << "Configurator: " << p.first << " value substituted\n"
+							  "\tfrom '" << oval << "' to '" << val << "'";
+			}
+		}
+
+		expandMacros(p.second, dict);
+	}
+}
+
+Task Configurator::loadTask(std::string filename_, const std::vector<std::pair<std::string, std::string> > & overrides)
+{
 	ptree * tmp_node;
+
+	std::vector<std::string> task_parts;
+	boost::split(task_parts, filename_, boost::is_any_of(":"));
+	if (task_parts.size() == 2) {
+		// retrieve task filename from dcl
+		std::string dcldir = Utils::findSubdir(task_parts[0], dcl_locations, true);
+		if (dcldir != "") {
+			configuration_filename = dcldir + "/tasks/" + task_parts[1] + ".xml";
+		} else {
+			throw Common::DisCODeException(std::string("Configuration: DCL '") + task_parts[0] + "' doesn't exist.\n");
+		}
+	} else {
+		// Set filename pointer to given one.
+		configuration_filename = filename_;
+	}
 
 	// Check whether config file exists.
 	if (!filesystem::exists(configuration_filename)) {
@@ -50,6 +105,7 @@ Task Configurator::loadConfiguration(std::string filename_, const std::vector<st
 	}
 	else {
 		Task task;
+		std::vector<std::pair<std::string, std::string> > dict;
 
 		// Load and parse configuration from file.
 		try {
@@ -66,6 +122,12 @@ Task Configurator::loadConfiguration(std::string filename_, const std::vector<st
 			std::cout << overrides[i].first << " set to " << overrides[i].second << std::endl;
 			configuration.put(std::string("Task.")+overrides[i].first, overrides[i].second);
 		}
+
+		std::string task_path = boost::filesystem::path(configuration_filename).branch_path().string();
+		dict.push_back(std::make_pair("%[TASK_LOCATION]%", task_path));
+
+		// expand macros used in config file
+		expandMacros(configuration, dict);
 
 		try {
 			tmp_node = &(configuration.get_child("Task.Executors"));
@@ -161,6 +223,7 @@ void Configurator::loadComponents(const ptree * node, Task & task) {
 			}
 		}
 
+		// loading old-style properties
 		if (kern->getProperties()) {
 			try {
 				kern->getProperties()->load(tmp);
@@ -179,22 +242,7 @@ void Configurator::loadComponents(const ptree * node, Task & task) {
 			}
 		}
 
-		//std::cout << name << " properties:\n";
 		kern->printProperties();
-
-
-		//std::cout << name << " properties defined in xml:" << std::endl;
-		/*BOOST_FOREACH( TreeNode nd2, tmp) {
-			//std::cout << nd2.first << "=[" << tmp.get(nd2.first, "") << "]" << std::endl;
-			prop = kern->getProperty(nd2.first);
-			if (prop != NULL) {
-				//std::cout << "\t- this property is present in component.\n";
-				if (prop->isPersistent()) {
-					//std::cout << "\t- this property is persistent.\n";
-					prop->retrieve(tmp.get(nd2.first, ""));
-				}
-			}
-		}*/
 
 		std::vector<std::string> props = kern->getAllProperties();
 		std::string s;
@@ -205,9 +253,9 @@ void Configurator::loadComponents(const ptree * node, Task & task) {
 				if (prop->isPersistent()) {
 					s = tmp.get(pr, "");
 					if (s != "") prop->retrieve(s);
-					LOG(LNOTICE) << pr << "=[" << prop->store() << "] from [" << s << "]";
+					LOG(LINFO) << pr << "=[" << prop->store() << "] from [" << s << "]";
 				} else {
-					LOG(LNOTICE) << pr << "=[" << prop->store() << "]";
+					LOG(LINFO) << pr << "=[" << prop->store() << "]";
 				}
 			}
 		}
@@ -218,7 +266,7 @@ void Configurator::loadComponents(const ptree * node, Task & task) {
 		ex = executorManager->getExecutor(thread);
 		ex->addComponent(name, kern);
 
-		LOG(LTRACE) << "Adding component " << name << " to subtask " << group << "\n";
+		LOG(LINFO) << "Adding component " << name << " to subtask " << group << "\n";
 
 		task[group] += kern;
 

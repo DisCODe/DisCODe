@@ -5,6 +5,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <cstring>
+#include <cstdio>
 
 #include "DisCODeException.hpp"
 
@@ -175,7 +176,22 @@ void TCPServer::start()
 
 		if (select_return == -1) {
 			perror("Select failed!");
-			throw Common::DisCODeException("Server creation failed.");
+
+			switch(errno) {
+			case EBADF:
+				// An invalid file descriptor was given in one of the sets. (Perhaps a file descriptor that was already closed, or one on which an error has occurred.)
+				std::cout << "An invalid file descriptor was given in one of the sets. (Perhaps a file descriptor that was already closed, or one on which an error has occurred.)\n";
+				break;
+			case EINTR:
+				// A signal was caught; see signal(7).
+				break;
+			case EINVAL:
+				// nfds is negative or the value contained within timeout is invalid.
+				break;
+			case ENOMEM:
+				// unable to allocate memory for internal tables.
+				throw Common::DisCODeException("TCPServe: Unable to allocate memory for internal tables");
+			}
 		}
 		if (select_return == 0) {
 			//std::cout << "Select timed out." << std::endl;

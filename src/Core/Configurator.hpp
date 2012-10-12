@@ -52,9 +52,19 @@ private:
 	ConnectionManager * connectionManager;
 
 	/*!
+	 * List of all registered locations of DCL
+	 */
+	std::vector<std::string> dcl_locations;
+
+	/*!
 	 * List containing execution thread name for each component
 	 */
 	std::map<std::string, std::string> component_executor;
+
+
+	void expandMacros(ptree & pt, const std::vector<std::pair<std::string, std::string> > & dict);
+
+	std::string & substitute(std::string & text, const std::vector<std::pair<std::string, std::string> > & dict);
 
 public:
 	Configurator();
@@ -64,7 +74,15 @@ public:
 	/*!
 	 * Loads configuration from xml file.
 	 */
-	Task loadConfiguration(std::string filename, const std::vector<std::pair<std::string, std::string> > & overrides);
+	void loadConfiguration(const ptree * config);
+
+	/*!
+	 * Prepare task from given task file
+	 * @param filename
+	 * @param overrides
+	 * @return
+	 */
+	Task loadTask(std::string filename, const std::vector<std::pair<std::string, std::string> > & overrides);
 
 	void loadExecutors(const ptree * node, Task & task);
 	void loadComponents(const ptree * node, Task & task);
@@ -81,6 +99,10 @@ public:
 
 	void setConnectionManager(ConnectionManager * cm) {
 		connectionManager = cm;
+	}
+
+	const std::vector<std::string> getDCLLocations() const {
+		return dcl_locations;
 	}
 };
 

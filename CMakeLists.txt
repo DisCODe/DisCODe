@@ -1,6 +1,6 @@
-# =[ FraDIA ]============================================================
+# =[ DisCODe ]===========================================================
 #
-# CMake Build Rules for FraDIA
+# CMake Build Rules for DisCODe
 #
 # =[ License ]===========================================================
 #
@@ -42,6 +42,36 @@ add_subdirectory(doc)
 
 add_subdirectory(share)
 
+
+
+# =======================================================================
+# DisCODeConfig.cmake preparation
+# =======================================================================
+
+#  Current version number:
+set(DISCODE_VERSION "1.0.0")
+
+string(REGEX MATCHALL "[0-9]" DISCODE_VERSION_PARTS "${DISCODE_VERSION}")
+
+list(GET DISCODE_VERSION_PARTS 0 DISCODE_VERSION_MAJOR)
+list(GET DISCODE_VERSION_PARTS 1 DISCODE_VERSION_MINOR)
+list(GET DISCODE_VERSION_PARTS 2 DISCODE_VERSION_PATCH)
+
+# include directories
+set(CMAKE_INCLUDE_DIRS_CONFIGCMAKE 
+	"${CMAKE_INSTALL_PREFIX}/include/Base" 
+	"${CMAKE_INSTALL_PREFIX}/include/Common" 
+	"${CMAKE_INSTALL_PREFIX}/include/Types" 
+	"${CMAKE_INSTALL_PREFIX}/include"
+)
+
+# lib directory
+set(CMAKE_LIB_DIRS_CONFIGCMAKE "${CMAKE_INSTALL_PREFIX}/lib")
+
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/DisCODeConfig.cmake.in" "${CMAKE_BINARY_DIR}/DisCODeConfig.cmake" IMMEDIATE @ONLY)
+
+install(FILES ${CMAKE_BINARY_DIR}/DisCODeConfig.cmake DESTINATION ${CMAKE_INSTALL_PREFIX}/share/DisCODe/)
 
 
 # =======================================================================

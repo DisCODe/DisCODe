@@ -1,6 +1,0 @@
-[submodule "gpuprocessor"]
-	path = gpuprocessor
-	url = http://github.com/mateuszpruchniak/gpuprocessor.git
-[submodule "src/Processors/MS"]
-	path = src/Processors/MS
-	url = https://maciek-slon@github.com/maciek-slon/DisCODe-components.git

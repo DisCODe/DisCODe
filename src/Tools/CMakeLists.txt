@@ -17,7 +17,18 @@ SET_TARGET_PROPERTIES(${BUILT_TOOLS} PROPERTIES
    INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib
 )
 
-install(
+INSTALL(
   TARGETS ${BUILT_TOOLS}
   RUNTIME DESTINATION bin COMPONENT applications
 )
+
+
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/create_dcl.py" "${CMAKE_BINARY_DIR}/create_dcl" IMMEDIATE @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/create_component.py" "${CMAKE_BINARY_DIR}/create_component" IMMEDIATE @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/diswizard.py" "${CMAKE_BINARY_DIR}/diswizard" IMMEDIATE @ONLY)
+
+INSTALL(
+  PROGRAMS ${CMAKE_BINARY_DIR}/create_dcl ${CMAKE_BINARY_DIR}/create_component ${CMAKE_BINARY_DIR}/diswizard
+  DESTINATION bin COMPONENT applications
+) 

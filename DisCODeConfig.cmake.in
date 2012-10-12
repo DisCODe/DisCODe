@@ -1,0 +1,64 @@
+# =[ DisCODeConfig.cmake ]======================================================
+#
+#  The DisCODe CMake configuration file.
+#
+# 
+#            !!! FILE GENERATED AUTOMATICALLY, DO NOT MODIFY !!!
+#
+#
+# =[ Usage from an external project ]===========================================
+#
+#    In your CMakeLists.txt, add these lines:
+#
+#    FIND_PACKAGE(DisCODe REQUIRED )
+#    TARGET_LINK_LIBRARIES(MY_TARGET_NAME ${DisCODe_LIBS})
+#
+# =[ Defined variables ]========================================================
+#
+#    DisCODe_LIBRARIES     - the list of libraries to links against.
+#    DisCODe_LIB_DIR       - the directory where lib files are.
+#    DisCODe_INCLUDE_DIRS  - the OpenCV include directories.
+#    DisCODe_VERSION       - the version of this DisCODe build. Example: "1.2.0"
+#    DisCODe_VERSION_MAJOR - major version part of DisCODe_VERSION. Example: "1"
+#    DisCODe_VERSION_MINOR - minor version part of DisCODe_VERSION. Example: "2"
+#    DisCODe_VERSION_PATCH - patch version part of DisCODe_VERSION. Example: "0"
+#
+# ==============================================================================
+
+
+# ==============================================================================
+# Include directories to add to the user project:
+# ==============================================================================
+
+# Provide the include directories to the caller
+SET(DisCODe_INCLUDE_DIRS @CMAKE_INCLUDE_DIRS_CONFIGCMAKE@)
+
+INCLUDE_DIRECTORIES(${DisCODe_INCLUDE_DIRS})
+
+# ==============================================================================
+# Link directories to add to the user project:
+# ==============================================================================
+
+# Provide the libs directory anyway, it may be needed in some cases.
+SET(DisCODe_LIB_DIR @CMAKE_LIB_DIRS_CONFIGCMAKE@)
+
+LINK_DIRECTORIES(${DisCODe_LIB_DIR})
+
+# ==============================================================================
+# Link libraries: e.g. Common, Base etc.
+# ==============================================================================
+
+SET(DisCODe_LIBRARIES Common Base)
+
+
+# ==============================================================================
+#  Version variables:
+# ==============================================================================
+
+SET(OpenCV_VERSION @DISCODE_VERSION@)
+SET(OpenCV_VERSION_MAJOR  @DISCODE_VERSION_MAJOR@)
+SET(OpenCV_VERSION_MINOR  @DISCODE_VERSION_MINOR@)
+SET(OpenCV_VERSION_PATCH  @DISCODE_VERSION_PATCH@)
+
+
+

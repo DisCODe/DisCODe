@@ -7,3 +7,4 @@ gdb/
 .settings
 *~
 calibration_opencv
+.pydev*

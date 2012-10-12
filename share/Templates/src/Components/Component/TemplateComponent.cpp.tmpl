@@ -1,0 +1,55 @@
+/*!
+ * \file
+ * \brief
+ */
+
+#include <memory>
+#include <string>
+
+#include "TemplateComponent.hpp"
+#include "Common/Logger.hpp"
+
+namespace Processors {
+namespace Example {
+
+TemplateComponent::TemplateComponent(const std::string & name) :
+		Base::Component(name) TMPLInitializer {
+	LOG(LTRACE) << "Hello Example\n";
+	TMPLConstructor
+}
+
+TemplateComponent::~TemplateComponent() {
+	LOG(LTRACE) << "Good bye Example\n";
+}
+
+bool TemplateComponent::onInit() {
+	LOG(LTRACE) << "Example::initialize\n";
+
+	// Register data streams, events and event handlers HERE!
+	TMPLInit
+	return true;
+}
+
+bool TemplateComponent::onFinish() {
+	LOG(LTRACE) << "Example::finish\n";
+
+	return true;
+}
+
+bool TemplateComponent::onStep() {
+	LOG(LTRACE) << "Example::step\n";
+	return true;
+}
+
+bool TemplateComponent::onStop() {
+	return true;
+}
+
+bool TemplateComponent::onStart() {
+	return true;
+}
+
+TMPLMethods
+
+} //: namespace Example
+} //: namespace Processors

@@ -13,6 +13,19 @@
 
 namespace Utils {
 
+#if (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 1))
+#define MARK_DEPRECATED(MSG) __attribute__((__deprecated__))
+#elif defined(_MSC_VER)
+#define MARK_DEPRECATED(MSG) __declspec(deprecated)
+#else
+#define MARK_DEPRECATED(MSG)
+#endif /* __GNUC__ */
+
+
+
+
+
+
 #if defined (_WIN32)
   #if defined(COMPILING_DLL)
     #define  MYLIB_EXPORT __declspec(dllexport)
@@ -33,6 +46,17 @@ namespace Utils {
  * \see \ref regex_basics
  */
 MYLIB_EXPORT std::vector<std::string> searchFiles(const std::string & root, const std::string & regexp, bool with_path = true);
+
+/*!
+ * List subdirectories of given folder
+ * @param root
+ * @param with_path
+ * @return
+ */
+MYLIB_EXPORT std::vector<std::string> getSubdirs(const std::string & root, bool with_path);
+
+MYLIB_EXPORT std::string findSubdir(const std::string & name, const std::vector<std::string> & roots, bool with_path);
+
 
 
 

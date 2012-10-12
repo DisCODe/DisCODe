@@ -19,7 +19,7 @@ This software is distributed under license:
 Main authors:
 
 * Tomasz Kornuta
-* Maciej Stefanczyk
+* Maciej Stefańczyk
   
   
 Build instructions

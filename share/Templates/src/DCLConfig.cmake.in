@@ -1,0 +1,16 @@
+# This file is used when other components needs to use something provided by this DCL. 
+# Provide any include paths and lib directories. Use @CMAKE_INSTALL_PREFIX@
+# to point to 'dist' directory of current DCL, it'll be substituted during installation. 
+
+# directory containing header files
+SET(TEMPLATE_ARG_DCL_NAME_INCLUDE_DIR @CMAKE_INSTALL_PREFIX@/include)
+INCLUDE_DIRECTORIES(${TEMPLATE_ARG_DCL_NAME_INCLUDE_DIR})
+
+# directory containing libraries
+SET(TEMPLATE_ARG_DCL_NAME_LIB_DIR @CMAKE_INSTALL_PREFIX@/lib)
+LINK_DIRECTORIES(${TEMPLATE_ARG_DCL_NAME_LIB_DIR})
+
+# list of libraries to link against when using features of TEMPLATE_ARG_DCL_NAME
+# add all additional libraries built by this dcl (NOT components)
+# SET(TEMPLATE_ARG_DCL_NAME_LIBS lib_1 lib_2)
+# SET(ADDITIONAL_LIB_DIRS @CMAKE_INSTALL_PREFIX@/lib ${ADDITIONAL_LIB_DIRS})

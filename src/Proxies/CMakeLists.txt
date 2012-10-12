@@ -1,5 +1,0 @@
-SET(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-MESSAGE(STATUS "Building proxies:")
-
-ADD_SINK(Mrrocpp)

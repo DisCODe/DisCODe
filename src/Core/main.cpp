@@ -239,6 +239,7 @@ int main(int argc, char* argv[])
 
 	Task task;
 
+	configurator.loadConfiguration(&conf);
 	configurator.setExecutorManager(&em);
 	configurator.setComponentManager(&km);
 	configurator.setConnectionManager(&cm);
@@ -259,9 +260,9 @@ int main(int argc, char* argv[])
 
 		server.start();
 
-		km.initializeComponentsList();
+		km.initializeComponentsList(configurator.getDCLLocations());
 
-		task = configurator.loadConfiguration(task_name, overrides);
+		task = configurator.loadTask(task_name, overrides);
 		if (!task.start()) {
 			LOG(LFATAL) << "Task::start() returned false\n";
 			running = false;

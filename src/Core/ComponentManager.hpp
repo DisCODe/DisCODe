@@ -71,36 +71,53 @@ public:
 	/*!
 	 * Method tries to create components from all shared libraries loaded from the . directory.
 	 */
-	void initializeComponentsList()
+	void initializeComponentsList(const std::vector<std::string> dcl_locations)
 	{
-		// Get filenames.
-		vector <string> files;
-		try {
-			getSOList("../lib", files);
-		}
-		catch(...) {
-		}
 
-		// Check number of so's to import.
-		if (files.empty()) {
-			LOG(LWARNING) << "ComponentManager: There are no dynamic libraries in the current directory.\n";
+		if (dcl_locations.size() < 1) {
+			LOG(LWARNING) << "No DCL locations speecified.";
 			return;
 		}
 
-		// Iterate through so names and add retrieved components to list.
-		BOOST_FOREACH(string file, files)
-		{
-			// Create component empty "shell".
-			ComponentFactory* k = new ComponentFactory();
-			// Try to initialize component.
-			if (k->lazyInitialize(file))
-			{
-				// Add component to list.
-				component_factories.insert(k->getName(), k);
+		std::string dcl_location;
+		std::vector<std::string> dcls;
+		BOOST_FOREACH(dcl_location, dcl_locations) {
+			std::vector<std::string> tmp_dcls = Utils::getSubdirs(dcl_location, true);
+			dcls.insert( dcls.end(), tmp_dcls.begin(), tmp_dcls.end() );
+		}
+
+
+		BOOST_FOREACH(dcl_location, dcls) {
+
+			// Get filenames.
+			vector <string> files;
+			try {
+				getSOList(dcl_location + "/dist/lib", files);
 			}
-			else
-				// Delete incorrect component.
-				delete (k);
+			catch(...) {
+			}
+
+			// Check number of so's to import.
+			if (files.empty()) {
+				LOG(LWARNING) << "ComponentManager: There are no dynamic libraries in " << dcl_location;
+			}
+
+			// Iterate through so names and add retrieved components to list.
+			BOOST_FOREACH(string file, files)
+			{
+				// Create component empty "shell".
+				ComponentFactory* k = new ComponentFactory();
+				// Try to initialize component.
+				if (k->lazyInitialize(file))
+				{
+					// Add component to list.
+					component_factories.insert(k->getName(), k);
+				}
+				else
+					// Delete incorrect component.
+					delete (k);
+			}//: FOREACH
+
 		}//: FOREACH
 
 		// Check number of successfully loaded components.

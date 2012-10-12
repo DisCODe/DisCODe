@@ -243,6 +243,9 @@ DataStreamInterface * Component::registerStream(const std::string& name, DataStr
 //------------------------------------------------------------------------------------
 
 void Component::printProperties() {
+	if (properties.empty())
+		return;
+
 	LOG(LINFO) << "Registered properties:";
 	BOOST_FOREACH(PropertyPair prop, properties) {
 		LOG(LINFO) << "\t" << prop.first;
