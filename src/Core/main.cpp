@@ -69,7 +69,6 @@ void terminate (int /* param */ ) {
 		return;
 	}
 
-	std::cout << "\rTerminating program...\n";
 	running = false;
 }
 
@@ -276,19 +275,27 @@ int main(int argc, char* argv[])
 		while(running) {
 			Common::Thread::msleep(50);
 		}
+		LOG(LNOTICE) << "Finishing DisCODe.";
+		LOG(LNOTICE) << "Stopping task...";
 
-		Common::Thread::msleep(500);
+		//Common::Thread::msleep(500);
 
 		task.stop();
-		task.finish();
 
+		LOG(LNOTICE) << "Task stopped. Finishing...";
+		task.finish();
+		LOG(LNOTICE) << "Task finished.";
+
+		LOG(LNOTICE) << "Releasing resources...";
 		km.release();
 		cm.release();
 		em.release();
-
 		km.deactivateComponentList();
+		LOG(LNOTICE) << "Released.";
 
+		LOG(LNOTICE) << "Stopping server...";
 		server.stop();
+		LOG(LNOTICE) << "Server stoped.";
 	}//: try
 
 	// =========================================================================

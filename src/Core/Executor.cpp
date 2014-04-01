@@ -112,7 +112,7 @@ bool Executor::ensureState(ExecutorState st, const std::string & errmsg) {
 }
 
 void Executor::restart() {
-	LOG(LTRACE) << "Executor::restart";
+	LOG(LTRACE) << "Executor("<<name()<<")::restart";
 	if (!ensureState(Paused, "Can't restart."))
 		return;
 
